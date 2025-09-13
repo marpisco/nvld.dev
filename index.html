@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>neverland — Marco Pisco</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root{
+            --bg:#031128;
+            --neon:#33d4ff;
+            --neon-2:#63f0ff;
+            --panel-bg: rgba(4,12,28,0.6);
+            --glass: rgba(255,255,255,0.04);
+        }
+        html,body{
+            height:100%;
+            margin:0;
+            font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            background:var(--bg);
+            color:#e8f6ff;
+            -webkit-font-smoothing:antialiased;
+            -moz-osx-font-smoothing:grayscale;
+        }
+
+        canvas#matrix{
+            position:fixed;
+            inset:0;
+            display:block;
+            z-index:0;
+            background:linear-gradient(180deg,#001021 0%, #001833 60%, #021a2b 100%);
+        }
+
+        .stage{
+            position:relative;
+            z-index:2;
+            min-height:100vh;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            padding:48px 20px;
+            box-sizing:border-box;
+        }
+
+        .card{
+            width:min(980px,94%);
+            display:flex;
+            gap:28px;
+            align-items:center;
+            background:linear-gradient(135deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+            border:1px solid rgba(255,255,255,0.04);
+            padding:28px;
+            border-radius:14px;
+            box-shadow: 0 10px 30px rgba(2,8,20,0.6);
+            backdrop-filter: blur(6px);
+        }
+
+        .avatar{
+            flex:0 0 160px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+        }
+
+        .avatar .bubble{
+            width:140px;
+            height:140px;
+            border-radius:20px;
+            display:grid;
+            place-items:center;
+            background:linear-gradient(135deg,#02283b 0%, #063b56 100%);
+            border:1px solid rgba(255,255,255,0.04);
+            box-shadow: 0 8px 22px rgba(2,20,35,0.6), inset 0 -6px 18px rgba(0,0,0,0.2);
+        }
+
+        .bubble svg { width:84px; height:84px; }
+
+        .content{
+            flex:1;
+            min-width:0;
+        }
+
+        h1{
+            margin:0 0 6px 0;
+            font-weight:700;
+            font-size:44px;
+            letter-spacing:-1px;
+            color:var(--neon-2);
+            text-transform:lowercase;
+            text-shadow: 0 2px 20px rgba(99,240,255,0.06);
+        }
+
+        p.lead{
+            margin:0 0 16px 0;
+            color:#cfeefb;
+            opacity:0.95;
+            font-weight:500;
+        }
+
+        .meta{
+            display:flex;
+            gap:12px;
+            flex-wrap:wrap;
+            align-items:center;
+            font-size:14px;
+            color:#bfefff;
+            opacity:0.9;
+        }
+
+        .pill{
+            background:var(--glass);
+            padding:8px 12px;
+            border-radius:999px;
+            border:1px solid rgba(255,255,255,0.03);
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+        }
+
+        .links{
+            margin-top:22px;
+            display:flex;
+            gap:12px;
+            align-items:center;
+            flex-wrap:wrap;
+        }
+
+        .links a{
+            color:var(--bg);
+            background:linear-gradient(90deg,var(--neon),var(--neon-2));
+            padding:10px 14px;
+            border-radius:10px;
+            text-decoration:none;
+            font-weight:600;
+            box-shadow: 0 6px 18px rgba(51,212,255,0.12);
+            transition:transform .18s ease, box-shadow .18s ease, opacity .12s;
+        }
+        .links a:hover{ transform:translateY(-3px); box-shadow: 0 12px 30px rgba(51,212,255,0.16); }
+
+        @media (max-width:720px){
+            .card{ flex-direction:column; align-items:flex-start; padding:18px; gap:16px; }
+            .avatar{ align-self:center; }
+            h1{ font-size:36px; text-align:center; width:100%; }
+            .content{ text-align:center; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix"></canvas>
+
+    <main class="stage" role="main">
+        <section class="card" aria-label="neverland front card">
+            <div class="avatar">
+                <div class="bubble" aria-hidden="true">
+                    <img src="https://avatars.githubusercontent.com/u/162377105?v=4" alt="Avatar" style="width:84px; height:84px; border-radius:12px;"/>
+                </div>
+            </div>
+
+            <div class="content">
+                <h1>neverland</h1>
+                <p class="lead">a.k.a Marco Pisco — student and developer</p>
+
+                <div class="meta" aria-hidden="true">
+                    <div class="pill">Student</div>
+                    <div class="pill">Developer</div>
+                    <div class="pill">Systems Administrator</div>
+                    <div class="pill">Backend Engineer</div>
+                </div>
+
+                <div class="links" style="margin-top:18px;">
+                    <a href="https://marcopisco.com/assets/portfolio.pdf" target="_blank" rel="noopener">Portfolio</a>
+                    <a href="https://marcopisco.com" target="_blank" rel="noopener">Personal site</a>
+                    <a href="https://github.com/marpisco" target="_blank" rel="noopener">GitHub</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Matrix-like background in blue tones
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+        let W = canvas.width = innerWidth;
+        let H = canvas.height = innerHeight;
+
+        const density = 0.012; // columns per pixel
+        let fontSize = 14;
+        let columns;
+        let drops = [];
+
+        // throttle requestAnimationFrame to slow the matrix animation
+        (function(){
+            const _rAF = window.requestAnimationFrame.bind(window);
+            const targetFPS = 18; // lower = slower (try 12-30)
+            const interval = 1000 / targetFPS;
+            let last = performance.now();
+            window.requestAnimationFrame = function(callback){
+                const now = performance.now();
+                const elapsed = now - last;
+                if (elapsed >= interval) {
+                    last = now - (elapsed % interval);
+                    return _rAF(callback);
+                }
+                return setTimeout(() => _rAF(callback), interval - elapsed);
+            };
+        })();
+
+        const chars = "01ABCDEFGHIJKLMNOPQRSTUVWYZabcdefghijklmnopqrstuvwxyz@#$%&*+-/<>?";
+        const colorA = "#0fd7ff";
+        const colorB = "#2bd7ff";
+        const bgFade = "rgba(1,6,15,0.15)";
+
+        function setup(){
+            W = canvas.width = innerWidth;
+            H = canvas.height = innerHeight;
+            fontSize = Math.max(12, Math.floor(Math.min(W, H) / 60));
+            columns = Math.floor(W / fontSize * (1 - density/2));
+            drops = [];
+            for(let i=0;i<columns;i++){
+                drops[i] = Math.floor(Math.random() * Math.max(1, H / fontSize));
+            }
+            ctx.font = fontSize + "px monospace";
+            ctx.textBaseline = "top";
+        }
+
+        function draw(){
+            // subtle translucent overlay to create trail fade
+            ctx.fillStyle = bgFade;
+            ctx.fillRect(0,0,W,H);
+
+            for(let i=0;i<columns;i++){
+                const x = i * fontSize;
+                const y = drops[i] * fontSize;
+
+                const ch = chars.charAt(Math.floor(Math.random() * chars.length));
+                // two-tone neon
+                ctx.fillStyle = Math.random() > 0.6 ? colorB : colorA;
+                ctx.fillText(ch, x, y);
+
+                if(y > H && Math.random() > 0.975){
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+            requestAnimationFrame(draw);
+        }
+
+        // initial run
+        setup();
+        // dim background vignette to emulate matrix glow
+        function drawVignette(){
+            const g = ctx.createLinearGradient(0,0,0,H);
+            g.addColorStop(0,'rgba(3,12,40,0.6)');
+            g.addColorStop(1,'rgba(0,8,20,0.6)');
+            ctx.fillStyle = g;
+            ctx.fillRect(0,0,W,H);
+        }
+
+        // handle resize
+        let resizeTimer;
+        addEventListener('resize', ()=>{
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(()=>{ setup(); }, 100);
+        });
+
+        // Start animation
+        requestAnimationFrame(draw);
+    </script>
+</body>
+</html>
